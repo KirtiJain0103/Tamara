@@ -3,6 +3,8 @@ package com.example.tamara
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.webkit.WebView
 import android.widget.Toast
 import co.tamara.sdk.PaymentResult
 import co.tamara.sdk.TamaraPayment
@@ -16,12 +18,17 @@ const val AUTH_TOKEN ="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhY2NvdW50SWQiOiI0
 
 const val NOTIFICATION_WEB_HOOK_URL = "https://www.ubuy.co.in"
 
-val checkouturl = "https://checkout.tamara.co/checkout/a49dbaa0-ad2c-4fd9-aa36-0f8f28a57a37?locale=ar_SA&orderId=db225000-ef4f-46e4-be5d-6ec5c13bb97c&show_item_images=with_item_images_shown&ajs_aid=db225000-ef4f-46e4-be5d-6ec5c13bb97c"
+val checkouturl = "https://checkout.tamara.co/checkout/98bcfd99-2f71-49dd-90b8-84bfda795174?locale=ar_SA&orderId=b0fe54cc-02c3-4735-8ad2-8a7feda6fc41&paymentType=PAY_BY_INSTALMENTS&show_item_images=with_item_images_shown&ajs_aid=b0fe54cc-02c3-4735-8ad2-8a7feda6fc41"
 val success = "https://www.a.ubuy.com.kw/en/ubpay/tamara/redirect/success"
 val failure = "https://www.a.ubuy.com.kw/en/ubpay/tamara/redirect/failure"
 val cancel = "https://www.a.ubuy.com.kw/en/ubpay/tamara/redirect/cancel"
 
-
+/*
+*
+* checkout url :https://checkout.tamara.co/checkout/98bcfd99-2f71-49dd-90b8-84bfda795174?locale=ar_SA&orderId=b0fe54cc-02c3-4735-8ad2-8a7feda6fc41&paymentType=PAY_BY_INSTALMENTS&show_item_images=with_item_images_shown&ajs_aid=b0fe54cc-02c3-4735-8ad2-8a7feda6fc41
+2023-02-02 09:41:28.328  2608-2608  TagUbuy                 com.ubuy                             V  tamara payment: checkout ::https://checkout.tamara.co/checkout/98bcfd99-2f71-49dd-90b8-84bfda795174?locale=ar_SA&orderId=b0fe54cc-02c3-4735-8ad2-8a7feda6fc41&paymentType=PAY_BY_INSTALMENTS&show_item_images=with_item_images_shown&ajs_aid=b0fe54cc-02c3-4735-8ad2-8a7feda6fc41 success ::https://www.a.ubuy.com.kw/en/ubpay/tamara/redirect/success fail  ::https://www.a.ubuy.com.kw/en/ubpay/tamara/redirect/failure cancel  ::https://www.a.ubuy.com.kw/en/ubpay/tamara/redirect/cancel
+*
+* */
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,8 +41,9 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.payment.setOnClickListener {
-            //binding.webview.loadUrl(checkouturl)
-           // binding.webview.settings.javaScriptEnabled = true
+
+            binding.webview.loadUrl(checkouturl)
+            binding.webview.settings.javaScriptEnabled = true
             TamaraPayment.Companion.startPayment(this, checkouturl, success, failure, cancel)
         }
 
@@ -45,9 +53,11 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
     super.onActivityResult(requestCode, resultCode, data)
     if(TamaraPaymentHelper.shouldHandleActivityResult(requestCode, resultCode, data)){
         val result = TamaraPaymentHelper.getData(data!!)
+        Log.e("OnActivityResult", "$result")
         when(result?.status){
             PaymentResult.STATUS_CANCEL ->{
                 Toast.makeText(this,"cancled",Toast.LENGTH_SHORT).show()
+                Log.e("OnActivityResult", " Canceled ")
             }
             PaymentResult.STATUS_FAILURE -> {
                 //Payment has occurred an error
